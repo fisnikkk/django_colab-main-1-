@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Manage Users (Staff Only)</h2>
+
+  <p><a href="{% url 'create_user' %}" class="btn btn-success">Create New User</a></p>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Staff?</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usr in all_users %}
+      <tr>
+        <td>{{ usr.username }}</td>
+        <td>{{ usr.email }}</td>
+        <td>
+          {% if usr.is_staff %}
+            <span style="color: green;">Yes</span>
+          {% else %}
+            <span style="color: red;">No</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if usr != user %}
+            <a href="{% url 'toggle_staff_status' usr.pk %}" class="btn btn-warning">
+              {% if usr.is_staff %}Demote{% else %}Promote{% endif %}
+            </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

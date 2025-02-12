@@ -6,12 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>My Django CRUD App</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
-          integrity="sha384-<computed SHA-384 hash>" crossorigin="anonymous">
-    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block extra_css %}{% endblock %}
@@ -101,25 +98,20 @@
       <!-- Navigation -->
       <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #8f663f; color: black;">
         <a class="navbar-brand" style="color: white;" href="{% url 'blog_post_list' %}">My App</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav me-auto">
             {% if user.is_authenticated %}
-              <a class="nav-link" style="color: white;" href="{% url 'user_profile_detail' user.pk %}">My Account</a>
+              <li class="nav-item">
+                <a class="nav-link" style="color: white;" href="{% url 'user_profile_detail' user.pk %}">My Account</a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link" style="color: white;" href="{% url 'logout' %}">Logout</a>
               </li>
-              <!-- REMOVED: 'Upload' and 'Books' nav items
-              <li class="nav-item">
-                <a class="nav-link" style="color: white;" href="{% url 'upload_file' %}">Upload</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" style="color: white;" href="{% url 'display_images' %}">Books</a>
-              </li>
-              -->
             {% else %}
               <li class="nav-item">
                 <a class="nav-link" style="color: white;" href="{% url 'login' %}">Login</a>
@@ -137,9 +129,9 @@
               </li>
             {% endif %}
             <!-- Search form -->
-            <form class="form-inline my-2 my-lg-0" id="search-form">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
-              <button class="btn btn-outline-success my-2 my-sm-0" style="color: white;" type="submit">Search</button>
+            <form class="d-flex" id="search-form">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
+              <button class="btn btn-outline-success" style="color: white;" type="submit">Search</button>
             </form>
           </ul>
         </div>
@@ -176,12 +168,18 @@
       console.log("BLOG_POST_DETAIL_URL_PREFIX:", BLOG_POST_DETAIL_URL_PREFIX);
     </script>
     
-    <!-- External JavaScript Files (loaded after global variables are defined) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" defer type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.1/dist/js/bootstrap.min.js" defer type="text/javascript"></script>
-    <script src="{% static 'js/autocomplete.js' %}" defer type="text/javascript"></script>
+    <!-- Load Scripts -->
+    <!-- 1) jQuery (optional in Bootstrap 5, but you have it) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 2) Popper & Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <!-- Your custom scripts -->
+    <script src="{% static 'js/autocomplete.js' %}" defer></script>
+    <script src="{% static 'js/upload.js' %}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+    
     {% block extra_js %}{% endblock %}
     
     <!-- Search form submit handler (fallback when user presses Enter or Search button) -->
@@ -194,11 +192,7 @@
           event.preventDefault();
           const query = searchInput.value.trim();
           if (query) {
-            // If your 'search' URL is /search/, do this:
             window.location.href = "{% url 'search' %}?q=" + encodeURIComponent(query);
-
-            // If your site uses /my_app/search/ instead, then:
-            // window.location.href = "/my_app/search/?q=" + encodeURIComponent(query);
           }
         });
       });

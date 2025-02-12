@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Create New User</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <!-- If you want to let staff choose whether this new user is also staff: 
+         Just put a checkbox in the form or do: 
+         <input type="checkbox" name="make_staff"> 
+         Then in views: if "make_staff" in request.POST: user.is_staff = True
+    -->
+    <button type="submit" class="btn btn-primary">Create User</button>
+  </form>
+</div>
+{% endblock %}
