@@ -30,6 +30,10 @@ urlpatterns = [
     path('upload/', views.upload_file, name='upload_file'),
     path('upload/success/', views.upload_success, name='upload_success'),
     path('change-password/', views.change_password, name='change_password'),
+    path('staff/manage_users/', views.manage_users, name='manage_users'),
+    path('staff/create_user/', views.create_user, name='create_user'),
+    path('extract_pdf_text/', views.extract_pdf_text, name='extract_pdf_text'),
+    path('staff/<int:user_id>/toggle_staff/', views.toggle_staff_status, name='toggle_staff_status'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

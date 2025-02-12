@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Manage Users (Staff Only)</h2>
+  <h2>Manage Users</h2>
 
   <p><a href="{% url 'create_user' %}" class="btn btn-success">Create New User</a></p>
 
@@ -29,6 +29,7 @@
           {% endif %}
         </td>
         <td>
+          <!-- Toggle staff status if it's not the current user? Up to you. -->
           {% if usr != user %}
             <a href="{% url 'toggle_staff_status' usr.pk %}" class="btn btn-warning">
               {% if usr.is_staff %}Demote{% else %}Promote{% endif %}

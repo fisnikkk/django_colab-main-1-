@@ -103,15 +103,27 @@
                 aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto">
             {% if user.is_authenticated %}
+              <!-- MY ACCOUNT -->
               <li class="nav-item">
-                <a class="nav-link" style="color: white;" href="{% url 'user_profile_detail' user.pk %}">My Account</a>
+                <a class="nav-link" style="color: white;" href="{% url 'user_profile_detail' user.pk %}">
+                  My Account
+                </a>
               </li>
+
+              <!-- LOGOUT via POST form -->
               <li class="nav-item">
-                <a class="nav-link" style="color: white;" href="{% url 'logout' %}">Logout</a>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                  {% csrf_token %}
+                  <button class="btn btn-link nav-link" style="color: white; text-decoration:none;">
+                    Logout
+                  </button>
+                </form>
               </li>
+
             {% else %}
               <li class="nav-item">
                 <a class="nav-link" style="color: white;" href="{% url 'login' %}">Login</a>
@@ -120,21 +132,32 @@
                 <a class="nav-link" style="color: white;" href="{% url 'register' %}">Register</a>
               </li>
             {% endif %}
+
+            <!-- Blog link -->
             <li class="nav-item">
               <a class="nav-link" style="color: white;" href="{% url 'blog_post_list' %}">My Blog</a>
             </li>
+
+            <!-- If staff, show user profiles -->
             {% if user.is_authenticated and user.is_staff %}
               <li class="nav-item">
-                <a class="nav-link" style="color: white;" href="{% url 'user_profile_list' %}">User Profiles</a>
+                <a class="nav-link" style="color: white;" href="{% url 'user_profile_list' %}">
+                  User Profiles
+                </a>
               </li>
             {% endif %}
+
             <!-- Search form -->
             <form class="d-flex" id="search-form">
               <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
-              <button class="btn btn-outline-success" style="color: white;" type="submit">Search</button>
+              <button class="btn btn-outline-success" style="color: white;" type="submit">
+                Search
+              </button>
             </form>
           </ul>
         </div>
+
+        <!-- Suggestions container for dynamic search -->
         <div id="search-suggestions" style="display:none;"></div>
       </nav>
       
@@ -148,53 +171,43 @@
     
     <!-- INLINE SCRIPT: Define global URL variables before external JS loads -->
     <script>
-      // The URL for search suggestions:
       const SEARCH_SUGGESTIONS_URL = "{% url 'search_suggestions' %}";
-
-      // We generate a dummy URL for blog_post_detail using pk=0:
       let rawDetailUrl = "{% url 'blog_post_detail' 0 %}";
-      // Typically yields "/blog_post/0/" or "/my_app/blog_post/0/"
-
-      // Strip off the "0/" to form a prefix:
       let BLOG_POST_DETAIL_URL_PREFIX = rawDetailUrl.replace(/0\/?$/, '');
-
-      // Ensure the prefix ends with a slash:
       if (!BLOG_POST_DETAIL_URL_PREFIX.endsWith('/')) {
         BLOG_POST_DETAIL_URL_PREFIX += '/';
       }
-
       console.log("SEARCH_SUGGESTIONS_URL:", SEARCH_SUGGESTIONS_URL);
       console.log("rawDetailUrl:", rawDetailUrl);
       console.log("BLOG_POST_DETAIL_URL_PREFIX:", BLOG_POST_DETAIL_URL_PREFIX);
     </script>
     
-    <!-- Load Scripts -->
-    <!-- 1) jQuery (optional in Bootstrap 5, but you have it) -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 2) Popper & Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
-    <!-- Your custom scripts -->
     <script src="{% static 'js/autocomplete.js' %}" defer></script>
     <script src="{% static 'js/upload.js' %}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
     
     {% block extra_js %}{% endblock %}
     
-    <!-- Search form submit handler (fallback when user presses Enter or Search button) -->
+    <!-- Search form submit handler (fallback for pressing Enter or the Search button) -->
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         const searchForm = document.getElementById("search-form");
         const searchInput = document.getElementById("search-input");
 
-        searchForm.addEventListener("submit", function(event) {
-          event.preventDefault();
-          const query = searchInput.value.trim();
-          if (query) {
-            window.location.href = "{% url 'search' %}?q=" + encodeURIComponent(query);
-          }
-        });
+        if (searchForm && searchInput) {
+          searchForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+              window.location.href = "{% url 'search' %}?q=" + encodeURIComponent(query);
+            }
+          });
+        }
       });
     </script>
   </body>

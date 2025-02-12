@@ -1,96 +1,129 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <h2 style="color: white;">Add Book &#128394;</h2>
+
 <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    
-    <!-- Title Field -->
-    <div class="mb-3" style="color: white;">
-      <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
-      <input type="text" class="form-control" id="{{ form.title.id_for_label }}" 
-             name="{{ form.title.html_name }}" style="background-color: white; color: black; border:2px solid brown" required>
-    </div>
-    
-    <!-- Author Field -->
-    <div class="mb-3" style="color: white;">
-      <label for="{{ form.author.id_for_label }}" class="form-label">Author</label>
-      <input type="text" class="form-control" id="{{ form.author.id_for_label }}" 
-             name="{{ form.author.html_name }}" style="background-color: white; color: black; border:2px solid brown" required>
-    </div>
-    
-    <!-- Content Field -->
-    <div class="mb-3" style="color: white;">
-      <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
-      <textarea class="form-control" id="{{ form.content.id_for_label }}" 
-                name="{{ form.content.html_name }}" rows="5" 
-                style="background-color: white; color: black; border:2px solid brown" required></textarea>
-    </div>
-    
-    <!-- Document Upload for Text Extraction -->
-    <div class="mb-3" style="color: white;">
-      <label for="{{ form.upload.id_for_label }}">Upload Document (txt, doc, docx, pdf):</label>
-      <input type="file" id="{{ form.upload.id_for_label }}" 
-             name="{{ form.upload.html_name }}" onchange="readFile(this);">
-      {% if form.upload.errors %}
-        <div class="invalid-feedback">
-          {{ form.upload.errors|join:", " }}
-        </div>
-      {% endif %}
-    </div>
-    
-    <!-- Cover Image Upload -->
-    <div class="mb-3" style="color: white;">
-      <label for="{{ form.cover_image.id_for_label }}">Cover Image:</label>
-      <input type="file" id="{{ form.cover_image.id_for_label }}" 
-             name="{{ form.cover_image.html_name }}" accept="image/*">
-      {% if form.cover_image.errors %}
-        <div class="invalid-feedback">
-          {{ form.cover_image.errors|join:", " }}
-        </div>
-      {% endif %}
-    </div>
-    
-    <button type="submit" class="btn btn-primary">Submit</button>
+  {% csrf_token %}
+
+  <!-- Title Field -->
+  <div class="mb-3" style="color: white;">
+    <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+    {{ form.title }}
+  </div>
+
+  <!-- Author Field -->
+  <div class="mb-3" style="color: white;">
+    <label for="{{ form.author.id_for_label }}" class="form-label">Author</label>
+    {{ form.author }}
+  </div>
+
+  <!-- Content Field -->
+  <div class="mb-3" style="color: white;">
+    <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+    {{ form.content }}
+  </div>
+
+  <!-- Document Upload for Text Extraction -->
+  <div class="mb-3" style="color: white;">
+    <label for="{{ form.upload.id_for_label }}">Upload Document (txt, doc, docx, pdf):</label>
+    {{ form.upload }}
+    {% if form.upload.errors %}
+      <div class="invalid-feedback">
+        {{ form.upload.errors|join:", " }}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Cover Image Upload -->
+  <div class="mb-3" style="color: white;">
+    <label for="{{ form.cover_image.id_for_label }}">Cover Image:</label>
+    {{ form.cover_image }}
+    {% if form.cover_image.errors %}
+      <div class="invalid-feedback">
+        {{ form.cover_image.errors|join:", " }}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Submit button for final creation -->
+  <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
 {% endblock content %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
 <script>
-  function readFile(input) {
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      // Get the file extension in lower case
-      const fileExtension = file.name.split('.').pop().toLowerCase();
+document.addEventListener("DOMContentLoaded", function() {
+  const fileInput = document.getElementById("{{ form.upload.id_for_label }}");
+  if (!fileInput) return;
 
-      if (fileExtension === 'txt') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('{{ form.content.id_for_label }}').value = e.target.result;
-        };
-        reader.readAsText(file);
-      } else if (['doc', 'docx', 'dot', 'dotx'].includes(fileExtension)) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const arrayBuffer = e.target.result;
-          // Use mammoth.js to extract raw text from Word files or templates
-          mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-            .then(function(result) {
-              document.getElementById('{{ form.content.id_for_label }}').value = result.value;
-            })
-            .catch(function(error) {
-              console.error("Error extracting text from Word file:", error);
-            });
-        };
-        reader.readAsArrayBuffer(file);
-      } else if (fileExtension === 'pdf') {
-        // For PDFs, extraction on the client side is not implemented.
-        console.log("PDF selected; text extraction will occur on form submission (server-side).");
-      } else {
-        alert('Unsupported file format. Only txt, doc, docx, dot, dotx, and pdf files are allowed for text extraction.');
-      }
+  fileInput.addEventListener("change", handleFileSelected);
+
+  async function handleFileSelected() {
+    if (!fileInput.files[0]) return;
+    const file = fileInput.files[0];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    // If .txt
+    if (fileExtension === 'txt') {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('{{ form.content.id_for_label }}').value = e.target.result;
+      };
+      reader.readAsText(file);
+
+    // If .doc, .docx, .dot, .dotx (doc client-side extraction via Mammoth)
+    } else if (['doc','docx','dot','dotx'].includes(fileExtension)) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+          .then(function(result) {
+            document.getElementById('{{ form.content.id_for_label }}').value = result.value;
+          })
+          .catch(function(error) {
+            console.error("Error extracting text from Word file:", error);
+          });
+      };
+      reader.readAsArrayBuffer(file);
+
+    // If pdf => do server-side AJAX
+    } else if (fileExtension === 'pdf') {
+      console.log("PDF selected; text extraction via server-side AJAX.");
+      await extractPdfServerSide(file);
+
+    } else {
+      alert('Unsupported file format. Only txt, doc, docx, dot, dotx, and pdf files are allowed for text extraction.');
     }
   }
+
+  async function extractPdfServerSide(file) {
+    // Build FormData
+    const formData = new FormData();
+    formData.append('pdf_file', file);
+
+    try {
+      const response = await fetch("/my_app/extract_pdf_text/", {
+        method: "POST",
+        body: formData
+      });
+      if (!response.ok) {
+        console.error("Server extraction failed", response.status, response.statusText);
+        return;
+      }
+      const data = await response.json();
+      if (data.success) {
+        document.getElementById('{{ form.content.id_for_label }}').value = data.text;
+      } else {
+        console.error("Error from server extraction:", data.error);
+      }
+    } catch (e) {
+      console.error("Error sending PDF to server for extraction:", e);
+    }
+  }
+});
 </script>
 {% endblock extra_js %}
-
