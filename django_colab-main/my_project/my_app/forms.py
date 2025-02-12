@@ -1,0 +1,53 @@
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import UserProfile, User
+from django import forms
+from django import forms
+from .models import Document
+from .models import BlogPost
+
+
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ('docfile',)
+        widgets = {
+            'docfile': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
+        }
+
+
+
+from django import forms
+from .models import BlogPost
+
+class BlogPostForm(forms.ModelForm):
+    class Meta:
+        model = BlogPost
+        fields = ['title', 'author', 'content', 'upload', 'cover_image']
+
+
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField()
+
+
+class UserProfileForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True, help_text="Required.")
+    email = forms.EmailField(max_length=254, required=True, help_text="Required.")
+    password = forms.CharField(widget=forms.PasswordInput, required=True, help_text="Required.")
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+
+    def save(self, commit=True):
+        user = super(UserProfileForm, self).save(commit=False)
+        user.username = self.cleaned_data['username']
+        user.email = self.cleaned_data['email']
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+        return user

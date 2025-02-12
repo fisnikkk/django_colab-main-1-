@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="KUjtesa"/>
+    <link rel="stylesheet" href="{% static 'css/upload.css' %}">
+    <script src="{% static 'js/upload.js' %}" defer type="text/javascript"></script>
+  </head>
+
+  <div class="user-profile" style="color: white;">
+    <h2>{{ user_profile.user.username }} &#128100;</h2>
+    <p>Email: {{ user_profile.user.email }}</p>
+    <a href="{% url 'user_profile_update' pk=user_profile.user.pk %}" class="btn btn-warning">Edit Profile</a>
+    <button class="favorite styled" type="button" style="background-color: #ffc107; border-radius: 4px; padding: 8px 18px;">
+      <a class="nav-link" href="{% url 'change_password' %}">Change Password</a>
+    </button>
+  </div>
+
+  {# The "My Books" section has been removed to clear out the unwanted images #}
+
+{% endblock %}
